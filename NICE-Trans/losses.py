@@ -114,4 +114,5 @@ class NJD:
 
 
 def Regu_loss(y_true, y_pred):
-    return Grad('l2').loss(y_true, y_pred) + NJD(1e-5).loss(y_true, y_pred)
+    return Grad('l2').loss(y_true, y_pred)  # Disable NJD loss if PyTorch>1.10
+    #return Grad('l2').loss(y_true, y_pred) + NJD(1e-5).loss(y_true, y_pred)
