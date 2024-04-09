@@ -26,6 +26,7 @@ def gen_s2s(gen, batch_size=1):
 def gen_pairs(pairs, batch_size=1):
     
     pairs_num = len(pairs)  
+    files = [np.load(f, allow_pickle=True)[0] for f in pairs]
     while True:
         idx1 = np.random.randint(pairs_num, size=batch_size)
         idx2 = np.random.randint(pairs_num, size=batch_size)
@@ -33,8 +34,9 @@ def gen_pairs(pairs, batch_size=1):
         # load fixed images
         X_data = []
         for idx in idx1:
-            fixed = pairs[idx]
-            X = np.load(fixed, allow_pickle=True)[0]
+            # fixed = pairs[idx]
+            # X = np.load(fixed, allow_pickle=True)[0]
+            X = files[idx]
             X = X[:,:,:144]
             X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
@@ -47,8 +49,9 @@ def gen_pairs(pairs, batch_size=1):
         # load moving images
         X_data = []
         for idx in idx2:
-            moving = pairs[idx]
-            X = np.load(moving, allow_pickle=True)[0]
+            # moving = pairs[idx]
+            # X = np.load(moving, allow_pickle=True)[0]
+            X = files[idx]
             X = X[:,:,:144]
             X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
