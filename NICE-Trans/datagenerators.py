@@ -1,6 +1,7 @@
 import os, sys
 import numpy as np
 import scipy.ndimage
+import torch
 
 def gen_s2s(gen, batch_size=1):
 
