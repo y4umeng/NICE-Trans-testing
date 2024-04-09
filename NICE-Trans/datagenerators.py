@@ -35,8 +35,8 @@ def gen_pairs(pairs, batch_size=1):
         for idx in idx1:
             fixed = pairs[idx]
             X = load_volfile(fixed)
-            X = X[:,:,:144]
-            X = np.reshape(X, (144, 192, 160))
+            # X = X[:,:,:144]
+            # X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:
@@ -49,8 +49,8 @@ def gen_pairs(pairs, batch_size=1):
         for idx in idx2:
             moving = pairs[idx]
             X = load_volfile(moving) 
-            X = X[:,:,:144]
-            X = np.reshape(X, (144, 192, 160))
+            # X = X[:,:,:144]
+            # X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:
