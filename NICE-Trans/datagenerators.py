@@ -79,10 +79,9 @@ def load_by_name(path, name):
 def load_volfile(datafile):
     with open(datafile, 'rb') as f:
         f =  pickle.load(f)
-        print(f"pickle: {type(f)}", flush=True)
-        print(f"pickle[0]: {type(f[0])}", flush=True)
-        return f
-    # np.load(moving, allow_pickle=True)[0]
+        # print(f"pickle: {type(f)}", flush=True)
+        # print(f"pickle[0]: {type(f[0])}", flush=True)
+        return f[0]
 
 
 def print_gpu_usage(note=""):
