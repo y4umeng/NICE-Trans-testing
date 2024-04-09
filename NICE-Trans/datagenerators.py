@@ -34,7 +34,7 @@ def gen_pairs(pairs, batch_size=1):
         X_data = []
         for idx in idx1:
             fixed = pairs[idx]
-            X = np.load(moving, allow_pickle=True)[0]
+            X = np.load(fixed, allow_pickle=True)[0]
             X = X[:,:,:144]
             X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
