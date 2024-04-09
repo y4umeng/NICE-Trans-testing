@@ -78,7 +78,7 @@ def train(train_dir,
         device = 'cpu'
 
     # prepare the model
-    model = networks.NICE_Trans(use_checkpoint=False)
+    model = networks.NICE_Trans()
     model.to(device)
     if load_model != './':
         print('loading', load_model)
