@@ -20,7 +20,7 @@ class NICE_Trans(nn.Module):
                  in_channels: int = 1, 
                  enc_channels: int = 8, 
                  dec_channels: int = 16, 
-                 use_checkpoint: bool = True):
+                 use_checkpoint: bool = False):
         super().__init__()
         
         self.Encoder = Conv_encoder(in_channels=in_channels,
