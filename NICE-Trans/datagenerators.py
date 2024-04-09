@@ -26,7 +26,6 @@ def gen_s2s(gen, batch_size=1):
 def gen_pairs(pairs, batch_size=1):
     
     pairs_num = len(pairs)  
-    files = [np.load(f, allow_pickle=True)[0] for f in pairs]
     while True:
         idx1 = np.random.randint(pairs_num, size=batch_size)
         idx2 = np.random.randint(pairs_num, size=batch_size)
