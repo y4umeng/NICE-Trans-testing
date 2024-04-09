@@ -2,7 +2,6 @@ import os, sys
 import numpy as np
 import scipy.ndimage
 
-
 def gen_s2s(gen, batch_size=1):
 
     while True:
@@ -16,17 +15,19 @@ def gen_s2s(gen, batch_size=1):
         yield ([fixed, moving], [fixed, Zero, fixed, Zero])
         
 
-def gen_pairs(path, pairs, batch_size=1):
+def gen_pairs(pairs, batch_size=1):
     
     pairs_num = len(pairs)  
     while True:
-        idxes = np.random.randint(pairs_num, size=batch_size)
+        idx1 = np.random.randint(pairs_num, size=batch_size)
+        idx2 = np.random.randint(pairs_num, size=batch_size)
 
         # load fixed images
         X_data = []
-        for idx in idxes:
-            fixed = bytes.decode(pairs[idx][0])
-            X = load_volfile(path+fixed, np_var='vol')
+        for idx in idx1:
+            fixed = pairs[idx]
+            X = np.load(fixed, allow_pickle=True)
+            X = np.reshape(X[:,:,:144], (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:
@@ -36,9 +37,10 @@ def gen_pairs(path, pairs, batch_size=1):
 
         # load moving images
         X_data = []
-        for idx in idxes:
-            moving = bytes.decode(pairs[idx][1])
-            X = load_volfile(path+moving, np_var='vol')
+        for idx in idx2:
+            moving = pairs[idx]
+            X = np.load(moving, allow_pickle=True)
+            X = np.reshape(X[:,:,:144], (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:

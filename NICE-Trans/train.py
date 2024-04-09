@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 import datagenerators
 import networks
 import losses
+from os import path
 
 
 def Dice(vol1, vol2, labels=None, nargout=1):
@@ -50,9 +51,7 @@ def NJD(displacement):
 
 
 def train(train_dir,
-          train_pairs,
           valid_dir, 
-          valid_pairs,
           model_dir,
           load_model,
           device,
@@ -62,8 +61,8 @@ def train(train_dir,
           batch_size):
 
     # preparation
-    train_pairs = np.load(train_dir+train_pairs, allow_pickle=True)
-    valid_pairs = np.load(valid_dir+valid_pairs, allow_pickle=True)
+    train_pairs =  glob(path.join(train_dir, "*.pkl"))
+    valid_pairs =  glob(path.join(valid_dir, "*.pkl"))
 
     # prepare model folder
     if not os.path.isdir(model_dir):
@@ -104,7 +103,7 @@ def train(train_dir,
     Weights = [1.0, 1.0, 1.0]
             
     # data generator
-    train_gen_pairs = datagenerators.gen_pairs(train_dir, train_pairs, batch_size=batch_size)
+    train_gen_pairs = datagenerators.gen_pairs(train_dir, batch_size=batch_size)
     train_gen = datagenerators.gen_s2s(train_gen_pairs, batch_size=batch_size)
 
     # training/validate loops
@@ -141,50 +140,50 @@ def train(train_dir,
             optimizer.step()
             
         # validation
-        model.eval()
-        valid_Dice = []
-        valid_Affine = []
-        valid_NJD = []
-        for valid_pair in valid_pairs:
+        # model.eval()
+        # valid_Dice = []
+        # valid_Affine = []
+        # valid_NJD = []
+        # for valid_pair in valid_pairs:
             
-            # generate inputs (and true outputs) and convert them to tensors
-            fixed_vol, fixed_seg = datagenerators.load_by_name(valid_dir, valid_pair[0])
-            fixed_vol = torch.from_numpy(fixed_vol).to(device).float()
-            fixed_seg = torch.from_numpy(fixed_seg).to(device).float()
+        #     # generate inputs (and true outputs) and convert them to tensors
+        #     fixed_vol, fixed_seg = datagenerators.load_by_name(valid_dir, valid_pair[0])
+        #     fixed_vol = torch.from_numpy(fixed_vol).to(device).float()
+        #     fixed_seg = torch.from_numpy(fixed_seg).to(device).float()
             
-            moving_vol, moving_seg = datagenerators.load_by_name(valid_dir, valid_pair[1])
-            moving_vol = torch.from_numpy(moving_vol).to(device).float()
-            moving_seg = torch.from_numpy(moving_seg).to(device).float()
+        #     moving_vol, moving_seg = datagenerators.load_by_name(valid_dir, valid_pair[1])
+        #     moving_vol = torch.from_numpy(moving_vol).to(device).float()
+        #     moving_seg = torch.from_numpy(moving_seg).to(device).float()
 
-            # run inputs through the model to produce a warped image and flow field
-            with torch.no_grad():
-                pred = model(fixed_vol, moving_vol)
-                warped_seg = SpatialTransformer(moving_seg, pred[1])
-                affine_seg = AffineTransformer(moving_seg, pred[3])
+        #     # run inputs through the model to produce a warped image and flow field
+        #     with torch.no_grad():
+        #         pred = model(fixed_vol, moving_vol)
+        #         warped_seg = SpatialTransformer(moving_seg, pred[1])
+        #         affine_seg = AffineTransformer(moving_seg, pred[3])
                 
-            fixed_seg = fixed_seg.detach().cpu().numpy().squeeze()
-            warped_seg = warped_seg.detach().cpu().numpy().squeeze()
-            Dice_val = Dice(warped_seg, fixed_seg)
-            valid_Dice.append(Dice_val)
+        #     fixed_seg = fixed_seg.detach().cpu().numpy().squeeze()
+        #     warped_seg = warped_seg.detach().cpu().numpy().squeeze()
+        #     Dice_val = Dice(warped_seg, fixed_seg)
+        #     valid_Dice.append(Dice_val)
             
-            affine_seg = affine_seg.detach().cpu().numpy().squeeze()
-            Affine_val = Dice(affine_seg, fixed_seg)
-            valid_Affine.append(Affine_val)
+        #     affine_seg = affine_seg.detach().cpu().numpy().squeeze()
+        #     Affine_val = Dice(affine_seg, fixed_seg)
+        #     valid_Affine.append(Affine_val)
             
-            flow = pred[1].detach().cpu().permute(0, 2, 3, 4, 1).numpy().squeeze()
-            NJD_val = NJD(flow)
-            valid_NJD.append(NJD_val)
+        #     flow = pred[1].detach().cpu().permute(0, 2, 3, 4, 1).numpy().squeeze()
+        #     NJD_val = NJD(flow)
+        #     valid_NJD.append(NJD_val)
         
         # print epoch info
         epoch_info = 'Epoch %d/%d' % (epoch + 1, epochs)
         time_info = 'Total %.2f sec' % (time.time() - start_time)
         train_losses = ', '.join(['%.4f' % f for f in np.mean(train_losses, axis=0)])
         train_loss_info = 'Train loss: %.4f  (%s)' % (np.mean(train_total_loss), train_losses)
-        valid_Dice_info = 'Valid final DSC: %.4f' % (np.mean(valid_Dice))
-        valid_Affine_info = 'Valid affine DSC: %.4f' % (np.mean(valid_Affine))
-        valid_NJD_info = 'Valid NJD: %.2f' % (np.mean(valid_NJD))
-        print(' - '.join((epoch_info, time_info, train_loss_info, valid_Dice_info, valid_Affine_info, valid_NJD_info)), flush=True)
-    
+        # valid_Dice_info = 'Valid final DSC: %.4f' % (np.mean(valid_Dice))
+        # valid_Affine_info = 'Valid affine DSC: %.4f' % (np.mean(valid_Affine))
+        # valid_NJD_info = 'Valid NJD: %.2f' % (np.mean(valid_NJD))
+        # print(' - '.join((epoch_info, time_info, train_loss_info, valid_Dice_info, valid_Affine_info, valid_NJD_info)), flush=True)
+        print(' - '.join((epoch_info, time_info, train_loss_info)), flush=True) 
         # save model checkpoint
         torch.save(model.state_dict(), os.path.join(model_dir, '%02d.pt' % (epoch+1)))
     
@@ -195,15 +194,11 @@ if __name__ == "__main__":
     parser.add_argument("--train_dir", type=str,
                         dest="train_dir", default='./',
                         help="folder with training data")
-    parser.add_argument("--train_pairs", type=str,
-                        dest="train_pairs", default='train_pairs.npy',
-                        help="training pairs(.npy)")
+    
     parser.add_argument("--valid_dir", type=str,
                         dest="valid_dir", default='./',
                         help="folder with validation data")
-    parser.add_argument("--valid_pairs", type=str,
-                        dest="valid_pairs", default='valid_pairs.npy',
-                        help="validation pairs(.npy)")
+    
     parser.add_argument("--model_dir", type=str,
                         dest="model_dir", default='./models/',
                         help="models folder")
