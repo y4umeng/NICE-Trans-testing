@@ -2,6 +2,13 @@ import os, sys
 import numpy as np
 import scipy.ndimage
 import torch
+import pickle
+
+def pkload(fname):
+    with open(fname, 'rb') as f:
+        f =  pickle.load(f)
+        print(f"pickle: {type(f)}", flush=True)
+        return f
 
 def gen_s2s(gen, batch_size=1):
 
