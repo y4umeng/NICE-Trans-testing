@@ -1,5 +1,5 @@
 import os
-import glob
+from glob import glob
 import sys
 import random
 import time
@@ -103,7 +103,7 @@ def train(train_dir,
     Weights = [1.0, 1.0, 1.0]
             
     # data generator
-    train_gen_pairs = datagenerators.gen_pairs(train_dir, batch_size=batch_size)
+    train_gen_pairs = datagenerators.gen_pairs(train_pairs, batch_size=batch_size)
     train_gen = datagenerators.gen_s2s(train_gen_pairs, batch_size=batch_size)
 
     # training/validate loops
