@@ -27,7 +27,8 @@ def gen_pairs(pairs, batch_size=1):
         for idx in idx1:
             fixed = pairs[idx]
             X = np.load(fixed, allow_pickle=True)
-            X = np.reshape(X[:,:,:144], (144, 192, 160))
+            X = X[:,:,:144]
+            X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:
@@ -40,7 +41,8 @@ def gen_pairs(pairs, batch_size=1):
         for idx in idx2:
             moving = pairs[idx]
             X = np.load(moving, allow_pickle=True)
-            X = np.reshape(X[:,:,:144], (144, 192, 160))
+            X = X[:,:,:144]
+            X = np.reshape(X, (144, 192, 160))
             X = X[np.newaxis, np.newaxis, ...]
             X_data.append(X)
         if batch_size > 1:
